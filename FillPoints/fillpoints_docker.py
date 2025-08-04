@@ -16,6 +16,7 @@ class FillPointsDocker(DockWidget):
         self.line_input = QLineEdit("Line")
         self.color_point_input = QLineEdit("FillPoints")
         self.color_output_input = QLineEdit("Color")
+        self.copy_input = QLineEdit("FillPoints")
 
         layout.addWidget(QLabel("Line Layer:"))
         layout.addWidget(self.line_input)
@@ -54,6 +55,10 @@ class FillPointsDocker(DockWidget):
         layout.addWidget(self.anim_start)
         layout.addWidget(QLabel("end:"))
         layout.addWidget(self.anim_end)
+        
+        layout.addWidget(QLabel("Copy frames from:"))
+        layout.addWidget(self.copy_input)
+
         self.add_btn = QPushButton("Fill Animation")
         layout.addWidget(self.add_btn)
         self.add_btn.clicked.connect(self.fill_animation)
@@ -65,10 +70,7 @@ class FillPointsDocker(DockWidget):
         
         active_node = doc.activeNode()
 
-        ltext = self.line_input.text()
-        ptext = self.color_point_input.text()
-        ctext = self.color_output_input.text()
-        r = self.getLayers(doc,ltext,ptext,ctext)
+        r = self.getLayers(doc)
         if r==None:
             return
         line_node,point_node,color_node,x,y,w,h = r
@@ -97,10 +99,7 @@ class FillPointsDocker(DockWidget):
         
         active_node = doc.activeNode()
 
-        ltext = self.line_input.text()
-        ptext = self.color_point_input.text()
-        ctext = self.color_output_input.text()
-        r = self.getLayers(doc,ltext,ptext,ctext)
+        r = self.getLayers(doc)
         if r==None:
             return
         line_node,point_node,color_node,x,y,w,h = r
@@ -134,11 +133,16 @@ class FillPointsDocker(DockWidget):
         #refresh
         doc.refreshProjection()
 
-    def getLayers(self, doc, ltext, ptext, ctext):
+    def getLayers(self, doc):
         #get Layers
+        ltext = self.line_input.text()
+        ptext = self.color_point_input.text()
+        ctext = self.color_output_input.text()
+        cpytext = self.copy_input.text()
         line_node = doc.nodeByName(ltext)
         point_node = doc.nodeByName(ptext)
         color_node = doc.nodeByName(ctext)
+        copynode = doc.nodeByName(cpytext)
 
         #if theres no input Layers create them and return
         if not all([line_node,point_node]):
@@ -152,7 +156,10 @@ class FillPointsDocker(DockWidget):
         
         #create output layer
         if color_node is None:
-            color_node = point_node.duplicate()
+            if copynode is None:
+                color_node = point_node.duplicate()
+            else:
+                color_node = copynode.duplicate()
             color_node.setName(ctext)
             doc.rootNode().addChildNode(color_node, None)
 
