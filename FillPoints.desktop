@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=FillPoints
+X-Python-2-Compatible=false
+X-Krita-Manual=manual.html
+X-Krita-Plugin-Dependencies=PyQt5
+Name=Ply's FillPoints
+Comment=Adds color points to quikly fill
